@@ -37,3 +37,8 @@ type `Ctrl + Shift + B`
 - Go to `chrome://extensions/`
 - Enable Developer mode
 - Load `dist` directory
+
+<br><br>
+
+> _This extension is a personal project and is not affiliated with, endorsed by, or sponsored by Twitch or any other Amazon company._\
+> _[© 2024 Twitch Interactive, Inc.](https://www.twitch.tv/) All rights reserved. Trademarks belong to their respective owners._
