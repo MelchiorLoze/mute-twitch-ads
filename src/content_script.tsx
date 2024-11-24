@@ -1,51 +1,71 @@
-let wasMutedBeforeAd: boolean = false;
+class TwitchAdMuter {
+  private static instance: TwitchAdMuter;
+  private wasMutedBeforeAd: boolean = false;
+  private muteButton: HTMLButtonElement;
 
-const getMuteButton = (): HTMLButtonElement => {
-  const muteButton = document.body.querySelector<HTMLButtonElement>(
-    'button[data-a-target="player-mute-unmute-button"]',
-  );
-  if (!muteButton) throw new Error('Mute button not found');
-  return muteButton;
-};
+  private constructor() {
+    this.muteButton = TwitchAdMuter.getMuteButton();
+  }
 
-const isPlayerMuted = (): boolean => {
-  const muteButton = getMuteButton();
-  return !!muteButton.getAttribute('aria-label')?.startsWith('Unmute');
-};
+  public static getInstance(): TwitchAdMuter {
+    if (!TwitchAdMuter.instance)
+      TwitchAdMuter.instance = new TwitchAdMuter();
+    return TwitchAdMuter.instance;
+  }
 
-const mutePlayer = (): void => {
-  const muteButton = getMuteButton();
-  if (!isPlayerMuted()) muteButton.click();
-};
+  private static getMuteButton(): HTMLButtonElement {
+    const muteButton = document.body.querySelector<HTMLButtonElement>(
+      'button[data-a-target="player-mute-unmute-button"]',
+    );
+    if (!muteButton) throw new Error('Mute button not found');
+    return muteButton;
+  }
 
-const unmutePlayer = (): void => {
-  const muteButton = getMuteButton();
-  if (isPlayerMuted()) muteButton.click();
-};
+  private isPlayerMuted(): boolean {
+    return !!this.muteButton.getAttribute('aria-label')?.startsWith('Unmute');
+  }
 
-const isNodeAdIndicator = (node: Node): boolean => {
-  return true; // TODO: Add condition to check if an ad was added
-};
+  private mutePlayer(): void {
+    if (!this.isPlayerMuted()) this.muteButton.click();
+  }
 
-const observer = new MutationObserver(mutations => {
-  mutations.forEach(mutation => {
-    if (mutation.type === 'childList') {
-      mutation.addedNodes.forEach(node => {
-        if (isNodeAdIndicator(node)) {
-          wasMutedBeforeAd = isPlayerMuted();
-          mutePlayer();
+  private unmutePlayer(): void {
+    if (this.isPlayerMuted()) this.muteButton.click();
+  }
+
+  private isNodeAdIndicator(node: Node): boolean {
+    return true; // TODO: Add condition to check if an ad was added
+  }
+
+  private initObserver(): void {
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        if (mutation.type === 'childList') {
+          mutation.addedNodes.forEach(node => {
+            if (this.isNodeAdIndicator(node)) {
+              this.wasMutedBeforeAd = this.isPlayerMuted();
+              this.mutePlayer();
+            }
+          });
+          mutation.removedNodes.forEach(node => {
+            if (this.isNodeAdIndicator(node) && !this.wasMutedBeforeAd) {
+              this.unmutePlayer();
+            }
+          });
         }
       });
-      mutation.removedNodes.forEach(node => {
-        if (isNodeAdIndicator(node) && !wasMutedBeforeAd) unmutePlayer();
-      });
-    }
-  });
-});
+    });
 
-observer.observe(document.body, {
-  childList: true,
-  subtree: true,
-});
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+  }
 
-console.log('Mute Twitch Ads content script loaded');
+  public run(): void {
+    this.initObserver();
+    console.log('Mute Twitch Ads content script loaded');
+  }
+}
+
+TwitchAdMuter.getInstance().run();
