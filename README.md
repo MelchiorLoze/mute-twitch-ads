@@ -1,5 +1,7 @@
 # Mute Twitch Ads
 
+<img src="public/icon.png" alt="" width="100" height="100" align="right">
+
 Automatically mute Twitch ads
 
 Made from [Chrome Extension TypeScript Starter](https://github.com/chibat/chrome-extension-typescript-starter)
