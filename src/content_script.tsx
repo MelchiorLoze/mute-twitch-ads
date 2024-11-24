@@ -1,15 +1,17 @@
 class TwitchAdMuter {
   private static instance: TwitchAdMuter;
+
   private wasMutedBeforeAd: boolean = false;
   private muteButton: HTMLButtonElement;
+  private isAdPresent: boolean;
 
   private constructor() {
     this.muteButton = TwitchAdMuter.getMuteButton();
+    this.isAdPresent = TwitchAdMuter.isAdBannerPresent();
   }
 
   public static getInstance(): TwitchAdMuter {
-    if (!TwitchAdMuter.instance)
-      TwitchAdMuter.instance = new TwitchAdMuter();
+    if (!TwitchAdMuter.instance) TwitchAdMuter.instance = new TwitchAdMuter();
     return TwitchAdMuter.instance;
   }
 
@@ -33,25 +35,22 @@ class TwitchAdMuter {
     if (this.isPlayerMuted()) this.muteButton.click();
   }
 
-  private isNodeAdIndicator(node: Node): boolean {
-    return true; // TODO: Add condition to check if an ad was added
+  private static isAdBannerPresent(): boolean {
+    return !!document.body.querySelector<HTMLElement>('span[data-a-target="video-ad-label"]');
   }
 
   private initObserver(): void {
     const observer = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
         if (mutation.type === 'childList') {
-          mutation.addedNodes.forEach(node => {
-            if (this.isNodeAdIndicator(node)) {
-              this.wasMutedBeforeAd = this.isPlayerMuted();
-              this.mutePlayer();
-            }
-          });
-          mutation.removedNodes.forEach(node => {
-            if (this.isNodeAdIndicator(node) && !this.wasMutedBeforeAd) {
-              this.unmutePlayer();
-            }
-          });
+          if (TwitchAdMuter.isAdBannerPresent()) {
+            this.isAdPresent = true;
+            this.wasMutedBeforeAd = this.isPlayerMuted();
+            this.mutePlayer();
+          } else if (this.isAdPresent && !this.wasMutedBeforeAd) {
+            this.isAdPresent = false;
+            this.unmutePlayer();
+          }
         }
       });
     });

@@ -4,7 +4,9 @@
   "description": "Automatically mute Twitch ads",
   "version": "1.0",
   "action": {
-    "default_icon": "icon.png",
+    "default_icon": {
+      "512": "icon.png"
+    },
     "default_popup": "popup.html"
   },
   "content_scripts": [
@@ -16,6 +18,6 @@
   "background": {
     "service_worker": "js/background.js"
   },
-  "permissions": ["storage"],
+  "permissions": [],
   "host_permissions": ["<all_urls>"]
 }
