@@ -43,11 +43,13 @@ class TwitchAdMuter {
     const observer = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
         if (mutation.type === 'childList') {
-          if (TwitchAdMuter.isAdBannerPresent()) {
-            this.isAdPresent = true;
-            this.wasMutedBeforeAd = this.isPlayerMuted();
-            this.mutePlayer();
-          } else if (this.isAdPresent && !this.wasMutedBeforeAd) {
+          if (!this.isAdPresent) {
+            if (TwitchAdMuter.isAdBannerPresent()) {
+              this.isAdPresent = true;
+              this.wasMutedBeforeAd = this.isPlayerMuted();
+              this.mutePlayer();
+            }
+          } else if (!this.wasMutedBeforeAd) {
             this.isAdPresent = false;
             this.unmutePlayer();
           }
