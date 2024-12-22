@@ -1,4 +1,5 @@
-import MuteTwitchAdsError from '../utils/error';
+import { MuteTwitchAdsError } from '../utils/error';
+import Logger from '../utils/logger';
 
 const MUTE_BUTTON_SELECTOR = 'button[data-a-target="player-mute-unmute-button"]';
 const VOLUME_SLIDER_SELECTOR = 'input[data-a-target="player-volume-slider"]';
@@ -32,10 +33,12 @@ export default class PlayerVolumeController {
   }
 
   public mute(): void {
+    Logger.info('Muting player');
     if (!this.isMuted()) this.muteButton.click();
   }
 
   public unmute(): void {
+    Logger.info('Unmuting player');
     if (this.isMuted()) this.muteButton.click();
   }
 

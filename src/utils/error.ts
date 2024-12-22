@@ -1,4 +1,4 @@
-export default class MuteTwitchAdsError extends Error {
+export class MuteTwitchAdsError extends Error {
   constructor(message: string) {
     super(`Mute Twitch Ads: ${message}`);
   }

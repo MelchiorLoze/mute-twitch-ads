@@ -1,3 +1,4 @@
+import Logger from '../utils/logger';
 import PlayerVolumeController from './player-volume-controller';
 
 const AD_BANNER_SELECTOR = 'span[data-a-target="video-ad-label"]';
@@ -28,12 +29,18 @@ export default class AdMuter {
     const hasAdAppearedOrDisappeared = this.wasAdPresent !== isAdBannerPresent;
 
     if (hasAdAppearedOrDisappeared) {
-      this.wasAdPresent = isAdBannerPresent;
-      if (isAdBannerPresent) this.wasMutedBeforeAd = this.playerVolumeController.isMuted();
+      if (isAdBannerPresent) {
+        Logger.info('Ad appeared');
+        this.wasMutedBeforeAd = this.playerVolumeController.isMuted();
+      } else {
+        Logger.info('Ad disappeared');
+      }
+
       if (!this.wasMutedBeforeAd) {
         if (isAdBannerPresent) this.playerVolumeController.mute();
         else this.playerVolumeController.unmute();
       }
+      this.wasAdPresent = isAdBannerPresent;
     }
   }
 
