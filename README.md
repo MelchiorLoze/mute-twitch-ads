@@ -1,10 +1,8 @@
-# Mute Twitch Ads
+# Mute Twitch Ads <img src="public/icon512.png" alt="" width="128" height="128" align="right">
 
-<img src="public/icon512.png" alt="" width="100" height="100" align="right">
+Chrome extension to automatically mute Twitch ads
 
-Automatically mute Twitch ads
-
-Made from [Chrome Extension TypeScript Starter](https://github.com/chibat/chrome-extension-typescript-starter)
+_Made from [Chrome Extension TypeScript Starter](https://github.com/chibat/chrome-extension-typescript-starter)_
 
 ## Prerequisites
 
@@ -40,7 +38,7 @@ type `Ctrl + Shift + B`
 - Enable Developer mode
 - Load `dist` directory
 
-<br><br>
+<br>
 
 > _This extension is a personal project and is not affiliated with, endorsed by, or sponsored by Twitch or any other Amazon company._\
 > _[© 2024 Twitch Interactive, Inc.](https://www.twitch.tv/) All rights reserved. Trademarks belong to their respective owners._
