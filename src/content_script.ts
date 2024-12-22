@@ -2,12 +2,12 @@ class TwitchAdMuter {
   private static instance: TwitchAdMuter;
 
   private wasMutedBeforeAd: boolean = false;
+  private wasAdPresent: boolean;
   private muteButton: HTMLButtonElement;
-  private isAdPresent: boolean;
 
   private constructor() {
+    this.wasAdPresent = TwitchAdMuter.isAdBannerPresent();
     this.muteButton = TwitchAdMuter.getMuteButton();
-    this.isAdPresent = TwitchAdMuter.isAdBannerPresent();
   }
 
   public static getInstance(): TwitchAdMuter {
@@ -39,23 +39,24 @@ class TwitchAdMuter {
     return Boolean(document.body.querySelector<HTMLElement>('span[data-a-target="video-ad-label"]'));
   }
 
-  private initObserver(): void {
+  private toggleMuteIfNecessary(): void {
+    const isAdBannerPresent = TwitchAdMuter.isAdBannerPresent();
+    const hasAdAppearedOrDisappeared = this.wasAdPresent !== isAdBannerPresent;
+
+    if (hasAdAppearedOrDisappeared) {
+      this.wasAdPresent = isAdBannerPresent;
+      if (isAdBannerPresent) this.wasMutedBeforeAd = this.isPlayerMuted();
+      if (!this.wasMutedBeforeAd) {
+        if (isAdBannerPresent) this.mutePlayer();
+        else this.unmutePlayer();
+      }
+    }
+  }
+
+  public run(): void {
     const observer = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
-        if (mutation.type === 'childList') {
-          const isAdBannerPresent = TwitchAdMuter.isAdBannerPresent();
-
-          if (isAdBannerPresent && !this.isAdPresent) {
-            this.isAdPresent = true;
-            this.wasMutedBeforeAd = this.isPlayerMuted();
-            if (!this.wasMutedBeforeAd) this.mutePlayer();
-          }
-
-          if (!isAdBannerPresent && this.isAdPresent) {
-            this.isAdPresent = false;
-            if (!this.wasMutedBeforeAd) this.unmutePlayer();
-          }
-        }
+        if (mutation.type === 'childList') this.toggleMuteIfNecessary();
       });
     });
 
@@ -63,10 +64,7 @@ class TwitchAdMuter {
       childList: true,
       subtree: true,
     });
-  }
 
-  public run(): void {
-    this.initObserver();
     console.log('Mute Twitch Ads content script loaded');
   }
 }
