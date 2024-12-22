@@ -2,7 +2,11 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 
 const Popup = () => {
-  return <h1>Mute Twitch Ads</h1>;
+  return (
+    <a href="https://github.com/MelchiorLoze/mute-twitch-ads" target="_blank">
+      Github
+    </a>
+  );
 };
 
 const root = createRoot(document.getElementById('root')!);
