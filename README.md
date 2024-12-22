@@ -1,6 +1,6 @@
 # Mute Twitch Ads
 
-<img src="public/icon.png" alt="" width="100" height="100" align="right">
+<img src="public/icon512.png" alt="" width="100" height="100" align="right">
 
 Automatically mute Twitch ads
 
