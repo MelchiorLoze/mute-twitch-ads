@@ -24,7 +24,7 @@ class TwitchAdMuter {
   }
 
   private isPlayerMuted(): boolean {
-    return !!this.muteButton.getAttribute('aria-label')?.startsWith('Unmute');
+    return Boolean(this.muteButton.getAttribute('aria-label')?.startsWith('Unmute'));
   }
 
   private mutePlayer(): void {
@@ -36,22 +36,24 @@ class TwitchAdMuter {
   }
 
   private static isAdBannerPresent(): boolean {
-    return !!document.body.querySelector<HTMLElement>('span[data-a-target="video-ad-label"]');
+    return Boolean(document.body.querySelector<HTMLElement>('span[data-a-target="video-ad-label"]'));
   }
 
   private initObserver(): void {
     const observer = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
         if (mutation.type === 'childList') {
-          if (!this.isAdPresent) {
-            if (TwitchAdMuter.isAdBannerPresent()) {
-              this.isAdPresent = true;
-              this.wasMutedBeforeAd = this.isPlayerMuted();
-              this.mutePlayer();
-            }
-          } else if (!this.wasMutedBeforeAd) {
+          const isAdBannerPresent = TwitchAdMuter.isAdBannerPresent();
+
+          if (isAdBannerPresent && !this.isAdPresent) {
+            this.isAdPresent = true;
+            this.wasMutedBeforeAd = this.isPlayerMuted();
+            if (!this.wasMutedBeforeAd) this.mutePlayer();
+          }
+
+          if (!isAdBannerPresent && this.isAdPresent) {
             this.isAdPresent = false;
-            this.unmutePlayer();
+            if (!this.wasMutedBeforeAd) this.unmutePlayer();
           }
         }
       });
