@@ -24,7 +24,10 @@ class TwitchAdMuter {
   }
 
   private isPlayerMuted(): boolean {
-    return Boolean(this.muteButton.getAttribute('aria-label')?.startsWith('Unmute'));
+    const volumeBar = document.body.querySelector<HTMLInputElement>('input[data-a-target="player-volume-slider"]');
+    if (!volumeBar) throw new Error('Volume bar not found');
+
+    return Boolean(volumeBar.value === '0');
   }
 
   private mutePlayer(): void {
