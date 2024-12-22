@@ -14,7 +14,8 @@
     "build": "webpack --config webpack/webpack.prod.js",
     "clean": "rimraf dist",
     "test": "npx jest --passWithNoTests",
-    "style": "prettier --write \"src/**/*.{ts,tsx}\""
+    "style": "prettier --write .",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "react": "^18.2.0",
