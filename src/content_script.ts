@@ -2,21 +2,20 @@ const MUTE_BUTTON_SELECTOR = 'button[data-a-target="player-mute-unmute-button"]'
 const VOLUME_SLIDER_SELECTOR = 'input[data-a-target="player-volume-slider"]';
 const AD_BANNER_SELECTOR = 'span[data-a-target="video-ad-label"]';
 
-class TwitchAdMuter {
-  private static instance: TwitchAdMuter;
+class PlayerVolumeController {
+  private static instance: PlayerVolumeController;
 
-  private wasMutedBeforeAd: boolean = false;
-  private wasAdPresent: boolean;
   private muteButton: HTMLButtonElement;
+  private volumeSlider: HTMLInputElement;
 
   private constructor() {
-    this.wasAdPresent = TwitchAdMuter.isAdBannerPresent();
-    this.muteButton = TwitchAdMuter.getMuteButton();
+    this.muteButton = PlayerVolumeController.getMuteButton();
+    this.volumeSlider = PlayerVolumeController.getVolumeSlider();
   }
 
-  public static getInstance(): TwitchAdMuter {
-    if (!TwitchAdMuter.instance) TwitchAdMuter.instance = new TwitchAdMuter();
-    return TwitchAdMuter.instance;
+  public static getInstance(): PlayerVolumeController {
+    if (!PlayerVolumeController.instance) PlayerVolumeController.instance = new PlayerVolumeController();
+    return PlayerVolumeController.instance;
   }
 
   private static getMuteButton(): HTMLButtonElement {
@@ -25,19 +24,40 @@ class TwitchAdMuter {
     return muteButton;
   }
 
-  private isPlayerMuted(): boolean {
+  private static getVolumeSlider(): HTMLInputElement {
     const volumeSlider = document.body.querySelector<HTMLInputElement>(VOLUME_SLIDER_SELECTOR);
     if (!volumeSlider) throw new Error('Volume slider not found');
-
-    return Boolean(volumeSlider.value === '0');
+    return volumeSlider;
   }
 
-  private mutePlayer(): void {
-    if (!this.isPlayerMuted()) this.muteButton.click();
+  public mute(): void {
+    if (!this.isMuted()) this.muteButton.click();
   }
 
-  private unmutePlayer(): void {
-    if (this.isPlayerMuted()) this.muteButton.click();
+  public unmute(): void {
+    if (this.isMuted()) this.muteButton.click();
+  }
+
+  public isMuted(): boolean {
+    return Boolean(this.volumeSlider.value === '0');
+  }
+}
+
+class TwitchAdMuter {
+  private static instance: TwitchAdMuter;
+
+  private wasMutedBeforeAd: boolean = false;
+  private wasAdPresent: boolean;
+  private playerVolumeController: PlayerVolumeController;
+
+  private constructor() {
+    this.wasAdPresent = TwitchAdMuter.isAdBannerPresent();
+    this.playerVolumeController = PlayerVolumeController.getInstance();
+  }
+
+  public static getInstance(): TwitchAdMuter {
+    if (!TwitchAdMuter.instance) TwitchAdMuter.instance = new TwitchAdMuter();
+    return TwitchAdMuter.instance;
   }
 
   private static isAdBannerPresent(): boolean {
@@ -50,10 +70,10 @@ class TwitchAdMuter {
 
     if (hasAdAppearedOrDisappeared) {
       this.wasAdPresent = isAdBannerPresent;
-      if (isAdBannerPresent) this.wasMutedBeforeAd = this.isPlayerMuted();
+      if (isAdBannerPresent) this.wasMutedBeforeAd = this.playerVolumeController.isMuted();
       if (!this.wasMutedBeforeAd) {
-        if (isAdBannerPresent) this.mutePlayer();
-        else this.unmutePlayer();
+        if (isAdBannerPresent) this.playerVolumeController.mute();
+        else this.playerVolumeController.unmute();
       }
     }
   }
