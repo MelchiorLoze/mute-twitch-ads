@@ -1,3 +1,7 @@
+const MUTE_BUTTON_SELECTOR = 'button[data-a-target="player-mute-unmute-button"]';
+const VOLUME_SLIDER_SELECTOR = 'input[data-a-target="player-volume-slider"]';
+const AD_BANNER_SELECTOR = 'span[data-a-target="video-ad-label"]';
+
 class TwitchAdMuter {
   private static instance: TwitchAdMuter;
 
@@ -16,18 +20,16 @@ class TwitchAdMuter {
   }
 
   private static getMuteButton(): HTMLButtonElement {
-    const muteButton = document.body.querySelector<HTMLButtonElement>(
-      'button[data-a-target="player-mute-unmute-button"]',
-    );
+    const muteButton = document.body.querySelector<HTMLButtonElement>(MUTE_BUTTON_SELECTOR);
     if (!muteButton) throw new Error('Mute button not found');
     return muteButton;
   }
 
   private isPlayerMuted(): boolean {
-    const volumeBar = document.body.querySelector<HTMLInputElement>('input[data-a-target="player-volume-slider"]');
-    if (!volumeBar) throw new Error('Volume bar not found');
+    const volumeSlider = document.body.querySelector<HTMLInputElement>(VOLUME_SLIDER_SELECTOR);
+    if (!volumeSlider) throw new Error('Volume slider not found');
 
-    return Boolean(volumeBar.value === '0');
+    return Boolean(volumeSlider.value === '0');
   }
 
   private mutePlayer(): void {
@@ -39,7 +41,7 @@ class TwitchAdMuter {
   }
 
   private static isAdBannerPresent(): boolean {
-    return Boolean(document.body.querySelector<HTMLElement>('span[data-a-target="video-ad-label"]'));
+    return Boolean(document.body.querySelector<HTMLElement>(AD_BANNER_SELECTOR));
   }
 
   private toggleMuteIfNecessary(): void {
