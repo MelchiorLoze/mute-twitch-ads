@@ -2,6 +2,12 @@ const MUTE_BUTTON_SELECTOR = 'button[data-a-target="player-mute-unmute-button"]'
 const VOLUME_SLIDER_SELECTOR = 'input[data-a-target="player-volume-slider"]';
 const AD_BANNER_SELECTOR = 'span[data-a-target="video-ad-label"]';
 
+class MuteTwitchAdsError extends Error {
+  constructor(message: string) {
+    super(`Mute Twitch Ads: ${message}`);
+  }
+}
+
 class PlayerVolumeController {
   private static instance: PlayerVolumeController;
 
@@ -20,13 +26,13 @@ class PlayerVolumeController {
 
   private static getMuteButton(): HTMLButtonElement {
     const muteButton = document.body.querySelector<HTMLButtonElement>(MUTE_BUTTON_SELECTOR);
-    if (!muteButton) throw new Error('Mute button not found');
+    if (!muteButton) throw new MuteTwitchAdsError('Mute button not found');
     return muteButton;
   }
 
   private static getVolumeSlider(): HTMLInputElement {
     const volumeSlider = document.body.querySelector<HTMLInputElement>(VOLUME_SLIDER_SELECTOR);
-    if (!volumeSlider) throw new Error('Volume slider not found');
+    if (!volumeSlider) throw new MuteTwitchAdsError('Volume slider not found');
     return volumeSlider;
   }
 
