@@ -22,7 +22,7 @@ jobs:
         run: npm ci
 
       - name: Run type check
-        run: npx tsc --noEmit
+        run: npm run type-check
 
   prettier-check:
     runs-on: ubuntu-latest
