@@ -4,14 +4,13 @@ import PlayerVolumeController from './player-volume-controller';
 const AD_BANNER_SELECTOR = 'span[data-a-target="video-ad-label"]';
 
 export default class AdMuter {
+  private wasMutedBeforeAd: boolean = false;
+  private isAdPlaying: boolean = false;
+
+  private playerVolumeController: PlayerVolumeController;
   private static instance: AdMuter;
 
-  private wasMutedBeforeAd: boolean = false;
-  private wasAdPresent: boolean;
-  private playerVolumeController: PlayerVolumeController;
-
   private constructor() {
-    this.wasAdPresent = AdMuter.isAdBannerPresent();
     this.playerVolumeController = PlayerVolumeController.getInstance();
   }
 
@@ -25,11 +24,11 @@ export default class AdMuter {
   }
 
   private toggleMuteIfNecessary(): void {
-    const isAdBannerPresent = AdMuter.isAdBannerPresent();
-    const hasAdAppearedOrDisappeared = this.wasAdPresent !== isAdBannerPresent;
+    const isAdPresent = AdMuter.isAdBannerPresent();
+    const hasAdAppearedOrDisappeared = this.isAdPlaying !== isAdPresent;
 
     if (hasAdAppearedOrDisappeared) {
-      if (isAdBannerPresent) {
+      if (isAdPresent) {
         Logger.info('Ad appeared');
         this.wasMutedBeforeAd = this.playerVolumeController.isMuted();
       } else {
@@ -37,10 +36,10 @@ export default class AdMuter {
       }
 
       if (!this.wasMutedBeforeAd) {
-        if (isAdBannerPresent) this.playerVolumeController.mute();
+        if (isAdPresent) this.playerVolumeController.mute();
         else this.playerVolumeController.unmute();
       }
-      this.wasAdPresent = isAdBannerPresent;
+      this.isAdPlaying = isAdPresent;
     }
   }
 
