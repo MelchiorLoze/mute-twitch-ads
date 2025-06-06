@@ -18,6 +18,9 @@
       "run_at": "document_end"
     }
   ],
+  "background": {
+    "service_worker": "js/service_worker.js"
+  },
   "permissions": [],
   "host_permissions": ["*://www.twitch.tv/*"]
 }

@@ -1,5 +1,5 @@
-import Logger from '../utils/logger';
-import PlayerVolumeController from './player-volume-controller';
+import Logger from '../utils/Logger';
+import { sendMuteEvent, sendUnmuteEvent } from './soundToggle';
 
 const AD_BANNER_SELECTOR = 'span[data-a-target="video-ad-label"]';
 
@@ -7,12 +7,7 @@ export default class AdMuter {
   private wasMutedBeforeAd: boolean = false;
   private isAdPlaying: boolean = false;
 
-  private playerVolumeController: PlayerVolumeController;
   private static instance: AdMuter;
-
-  private constructor() {
-    this.playerVolumeController = PlayerVolumeController.getInstance();
-  }
 
   private static getInstance(): AdMuter {
     if (!AdMuter.instance) AdMuter.instance = new AdMuter();
@@ -23,22 +18,21 @@ export default class AdMuter {
     return Boolean(document.body.querySelector<HTMLElement>(AD_BANNER_SELECTOR));
   }
 
-  private toggleMuteIfNecessary(): void {
+  private async toggleSoundIfNecessary(): Promise<void> {
     const isAdPresent = AdMuter.isAdBannerPresent();
     const hasAdAppearedOrDisappeared = this.isAdPlaying !== isAdPresent;
 
     if (hasAdAppearedOrDisappeared) {
       if (isAdPresent) {
         Logger.info('Ad appeared');
-        this.wasMutedBeforeAd = this.playerVolumeController.isMuted();
+        const success = await sendMuteEvent();
+        this.wasMutedBeforeAd = !success;
       } else {
         Logger.info('Ad disappeared');
+        if (!this.wasMutedBeforeAd) sendUnmuteEvent();
+        else Logger.info('Sound was muted before ad appeared, not unmuting');
       }
 
-      if (!this.wasMutedBeforeAd) {
-        if (isAdPresent) this.playerVolumeController.mute();
-        else this.playerVolumeController.unmute();
-      }
       this.isAdPlaying = isAdPresent;
     }
   }
@@ -47,16 +41,13 @@ export default class AdMuter {
     Logger.info('Initializing ad muter...');
     const instance = AdMuter.getInstance();
 
-    const observer = new MutationObserver(mutations => {
-      mutations.forEach(mutation => {
-        if (mutation.type === 'childList') instance.toggleMuteIfNecessary();
-      });
-    });
-
-    observer.observe(document.body, {
+    new MutationObserver(mutations => {
+      if (mutations.some(mutation => mutation.type === 'childList')) instance.toggleSoundIfNecessary();
+    }).observe(document.body, {
       childList: true,
       subtree: true,
     });
+
     Logger.info('Ad muter running');
   }
 }
