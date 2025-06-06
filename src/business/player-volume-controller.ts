@@ -13,11 +13,16 @@ export default class PlayerVolumeController {
   private constructor() {
     this.muteButton = PlayerVolumeController.getMuteButton();
     this.volumeSlider = PlayerVolumeController.getVolumeSlider();
+    Logger.info('Volume controls initialized');
   }
 
   public static getInstance(): PlayerVolumeController {
     if (!PlayerVolumeController.instance) PlayerVolumeController.instance = new PlayerVolumeController();
     return PlayerVolumeController.instance;
+  }
+
+  public static isMuteButtonPresent(): boolean {
+    return Boolean(document.body.querySelector<HTMLButtonElement>(MUTE_BUTTON_SELECTOR));
   }
 
   private static getMuteButton(): HTMLButtonElement {

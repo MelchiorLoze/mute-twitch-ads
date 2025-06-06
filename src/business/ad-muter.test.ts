@@ -3,6 +3,7 @@ import AdMuter from './ad-muter';
 import PlayerVolumeController from './player-volume-controller';
 
 jest.mock('../utils/logger');
+const LoggerMock = jest.mocked(Logger);
 
 const playerVolumeControllerMock = {
   mute: jest.fn(),
@@ -21,6 +22,13 @@ global.MutationObserver = jest.fn(cb => {
 
 const AD_BANNER_HTML = `<span data-a-target="video-ad-label"></span>`;
 
+const run = () => {
+  AdMuter.run();
+  expect(LoggerMock.info).toHaveBeenCalledWith('Initializing ad muter...');
+  expect(LoggerMock.info).toHaveBeenCalledWith('Ad muter running');
+  LoggerMock.info.mockClear();
+};
+
 describe('AdMuter', () => {
   beforeEach(() => {
     (AdMuter as any).instance = undefined;
@@ -33,71 +41,71 @@ describe('AdMuter', () => {
   });
 
   it('should mute when ad appears and unmute when ad disappears', () => {
-    AdMuter.run();
+    run();
     const mutationObserverCallback = (MutationObserver as any).mock.calls[0][0];
 
     // Simulate ad appearing
     document.body.innerHTML = AD_BANNER_HTML;
     mutationObserverCallback([{ type: 'childList' }]);
 
-    expect(Logger.info).toHaveBeenCalledWith('Ad appeared');
+    expect(LoggerMock.info).toHaveBeenCalledWith('Ad appeared');
     expect(playerVolumeControllerMock.mute).toHaveBeenCalled();
 
     // Simulate ad disappearing
     document.body.innerHTML = '';
     mutationObserverCallback([{ type: 'childList' }]);
 
-    expect(Logger.info).toHaveBeenCalledWith('Ad disappeared');
+    expect(LoggerMock.info).toHaveBeenCalledWith('Ad disappeared');
     expect(playerVolumeControllerMock.unmute).toHaveBeenCalled();
   });
 
   it('should not unmute if it was muted before ad', () => {
     playerVolumeControllerMock.isMuted.mockReturnValue(true);
 
-    AdMuter.run();
+    run();
     const mutationObserverCallback = (MutationObserver as any).mock.calls[0][0];
 
     // Simulate ad appearing
     document.body.innerHTML = AD_BANNER_HTML;
     mutationObserverCallback([{ type: 'childList' }]);
 
-    expect(Logger.info).toHaveBeenCalledWith('Ad appeared');
+    expect(LoggerMock.info).toHaveBeenCalledWith('Ad appeared');
     expect(playerVolumeControllerMock.mute).not.toHaveBeenCalled();
 
     // Simulate ad disappearing
     document.body.innerHTML = '';
     mutationObserverCallback([{ type: 'childList' }]);
 
-    expect(Logger.info).toHaveBeenCalledWith('Ad disappeared');
+    expect(LoggerMock.info).toHaveBeenCalledWith('Ad disappeared');
     expect(playerVolumeControllerMock.unmute).not.toHaveBeenCalled();
   });
 
   it('should not unmute if ad does not dissapear', () => {
-    AdMuter.run();
+    run();
     const mutationObserverCallback = (MutationObserver as any).mock.calls[0][0];
 
     // Simulate ad appearing
     document.body.innerHTML = AD_BANNER_HTML;
     mutationObserverCallback([{ type: 'childList' }]);
 
-    expect(Logger.info).toHaveBeenCalledWith('Ad appeared');
+    expect(LoggerMock.info).toHaveBeenCalledWith('Ad appeared');
     expect(playerVolumeControllerMock.mute).toHaveBeenCalled();
 
     // Simulate no change in ad state
     mutationObserverCallback([{ type: 'childList' }]);
 
-    expect(Logger.info).toHaveBeenCalledTimes(1);
+    expect(LoggerMock.info).toHaveBeenCalledTimes(1);
     expect(playerVolumeControllerMock.mute).toHaveBeenCalledTimes(1);
   });
 
   it('should not mute if ad does not appear', () => {
-    AdMuter.run();
+    run();
     const mutationObserverCallback = (MutationObserver as any).mock.calls[0][0];
 
     // Simulate no change in ad state
     mutationObserverCallback([{ type: 'childList' }]);
 
-    expect(Logger.info).not.toHaveBeenCalled();
+    expect(LoggerMock.info).not.toHaveBeenCalled();
     expect(playerVolumeControllerMock.mute).not.toHaveBeenCalled();
   });
 });

@@ -44,6 +44,7 @@ export default class AdMuter {
   }
 
   public static run(): void {
+    Logger.info('Initializing ad muter...');
     const instance = AdMuter.getInstance();
 
     const observer = new MutationObserver(mutations => {
@@ -56,5 +57,6 @@ export default class AdMuter {
       childList: true,
       subtree: true,
     });
+    Logger.info('Ad muter running');
   }
 }

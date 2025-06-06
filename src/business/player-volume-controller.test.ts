@@ -25,6 +25,13 @@ describe('PlayerVolumeController', () => {
     jest.clearAllMocks();
   });
 
+  it('should initialize volume controls', () => {
+    const instance = PlayerVolumeController.getInstance();
+
+    expect(instance).toBeInstanceOf(PlayerVolumeController);
+    expect(Logger.info).toHaveBeenCalledWith('Volume controls initialized');
+  });
+
   describe('mute()', () => {
     it('should mute player', () => {
       PlayerVolumeController.getInstance().mute();
