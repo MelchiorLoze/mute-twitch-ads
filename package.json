@@ -14,9 +14,11 @@
     "build": "webpack --config webpack/webpack.prod.js",
     "package": "zip -r dist.zip dist/",
     "clean": "rimraf dist/ dist.zip",
-    "test": "npx jest",
-    "style": "prettier --write .",
-    "type-check": "tsc --noEmit"
+    "test": "jest --randomize",
+    "test:ci": "jest --ci --randomize",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "type-check": "tsc --strict --noEmit"
   },
   "devDependencies": {
     "@types/chrome": "0.0.287",
